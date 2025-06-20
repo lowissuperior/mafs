@@ -105,6 +105,30 @@
             line-height: 1.5; /* Tighter line height for blockquote content */
         }
 
+        /* Stacked fraction styling */
+        .frac-display {
+            display: inline-flex; /* Use flex for internal layout */
+            flex-direction: column;
+            align-items: center; /* Center horizontally */
+            justify-content: center;
+            vertical-align: middle; /* Align the whole fraction block with surrounding text */
+            line-height: 1.1; /* Compact line spacing */
+            font-size: 0.9em; /* Slightly smaller overall size */
+        }
+        .frac-num, .frac-den {
+            padding: 0 2px; /* Small padding left/right for content */
+        }
+        .frac-line {
+            display: block;
+            width: 100%; /* Line spans full width of its container */
+            height: 1px; /* Thickness of the line */
+            background-color: currentColor; /* Inherit color from parent for the line */
+            margin: 1px 0; /* Space above and below the line */
+        }
+        /* Adjustments for tight spacing */
+        .frac-num { margin-bottom: -0.1em; } /* Pull numerator closer to line */
+        .frac-den { margin-top: -0.1em; } /* Pull denominator closer to line */
+
     </style>
 </head>
 <body class="antialiased">
@@ -172,16 +196,16 @@
                             <p><strong>Concept:</strong> The difference between the slope of a secant line (Average Rate of Change - AROC) and the slope of a tangent line (Instantaneous Rate of Change - IROC).</p>
                             <div>
                                 <h4 class="font-semibold text-stone-700">Question Type 1: "Find the average rate of change of f(x) on the interval [a, b]."</h4>
-                                <p><strong>How to Solve:</strong> This is the slope formula. Calculate points (a, f(a)) and (b, f(b)), then use the formula: <span class="math-formula">AROC = (f(b) - f(a)) / (b - a)</span>.</p>
+                                <p><strong>How to Solve:</strong> This is the slope formula. Calculate points (a, f(a)) and (b, f(b)), then use the formula: <span class="math-formula">AROC = <span class="frac-display"><span class="frac-num">(f(b) - f(a))</span><span class="frac-line"></span><span class="frac-den">(b - a)</span></span></span>.</p>
                                 <blockquote class="blockquote mt-2 p-3 bg-stone-50 border-l-4 border-teal-500 rounded-r-lg">
                                     <p><strong>Example:</strong> Find the AROC of <span class="math-formula">f(x) = x²</span> on <span class="math-formula">[1, 3]</span>.</p>
                                     <p><span class="math-formula">f(1) = 1</span>, <span class="math-formula">f(3) = 9</span>.</p>
-                                    <p><span class="math-formula">AROC = (9 - 1) / (3 - 1) = 8 / 2 = 4</span>.</p>
+                                    <p><span class="math-formula">AROC = <span class="frac-display"><span class="frac-num">(9 - 1)</span><span class="frac-line"></span><span class="frac-den">(3 - 1)</span></span> = <span class="frac-display"><span class="frac-num">8</span><span class="frac-line"></span><span class="frac-den">2</span></span> = 4</span>.</p>
                                 </blockquote>
                             </div>
                              <div>
                                 <h4 class="font-semibold text-stone-700">Question Type 2: "Estimate the instantaneous rate of change of f(x) at x = a."</h4>
-                                <p><strong>How to Solve:</strong> Find the AROC over a very small interval, like <span class="math-formula">[a, a + 0.001]</span>. The formula becomes: <span class="math-formula">IROC ≈ (f(a + 0.001) - f(a)) / 0.001</span>.</p>
+                                <p><strong>How to Solve:</strong> Find the AROC over a very small interval, like <span class="math-formula">[a, a + 0.001]</span>. The formula becomes: <span class="math-formula">IROC ≈ <span class="frac-display"><span class="frac-num">(f(a + 0.001) - f(a))</span><span class="frac-line"></span><span class="frac-den">0.001</span></span></span>.</p>
                             </div>
                         </div>
                     </details>
@@ -198,22 +222,22 @@
                                 <h4 class="font-semibold text-stone-700">Type 2: Indeterminate Form (<span class="math-formula">0/0</span>)</h4>
                                 <p><strong>Method A (Factoring):</strong> Factor the numerator and denominator, cancel the term causing the zero (<span class="math-formula">x-a</span>), and re-substitute.</p>
                                 <blockquote class="blockquote mt-2 p-3 bg-stone-50 border-l-4 border-teal-500 rounded-r-lg">
-                                    <p><strong>Example:</strong> <span class="math-formula"><span class="limit-op">lim<span class="limit-sub">x&rarr;3</span></span> (x&sup2; - 9) / (x - 3)</span></p>
-                                    <p>Factor: <span class="math-formula"><span class="limit-op">lim<span class="limit-sub">x&rarr;3</span></span> (x - 3)(x + 3) / (x - 3)</span> &rarr; <span class="math-formula"><span class="limit-op">lim<span class="limit-sub">x&rarr;3</span></span> (x + 3)</span> &rarr; <span class="math-formula">3 + 3 = 6</span>.</p>
+                                    <p><strong>Example:</strong> <span class="math-formula"><span class="limit-op">lim<span class="limit-sub">x&rarr;3</span></span> <span class="frac-display"><span class="frac-num">(x&sup2; - 9)</span><span class="frac-line"></span><span class="frac-den">(x - 3)</span></span></span></p>
+                                    <p>Factor: <span class="math-formula"><span class="limit-op">lim<span class="limit-sub">x&rarr;3</span></span> <span class="frac-display"><span class="frac-num">(x - 3)(x + 3)</span><span class="frac-line"></span><span class="frac-den">(x - 3)</span></span></span> &rarr; <span class="math-formula"><span class="limit-op">lim<span class="limit-sub">x&rarr;3</span></span> (x + 3)</span> &rarr; <span class="math-formula">3 + 3 = 6</span>.</p>
                                 </blockquote>
                                 <p class="mt-2"><strong>Method B (Rationalizing):</strong> For roots, multiply the numerator and denominator by the conjugate. Simplify and cancel the (<span class="math-formula">x-a</span>) term, then re-substitute.</p>
                                  <blockquote class="blockquote mt-2 p-3 bg-stone-50 border-l-4 border-teal-500 rounded-r-lg">
-                                    <p><strong>Example:</strong> <span class="math-formula"><span class="limit-op">lim<span class="limit-sub">x&rarr;0</span></span> (√(x+4) - 2) / x</span></p>
-                                    <p>Multiply by conjugate (<span class="math-formula">√(x+4) + 2</span>). Numerator becomes <span class="math-formula">x</span>. Expression is <span class="math-formula">1 / (√(x+4) + 2)</span>. Re-substitute <span class="math-formula">0</span> to get <span class="math-formula">1/4</span>.</p>
+                                    <p><strong>Example:</strong> <span class="math-formula"><span class="limit-op">lim<span class="limit-sub">x&rarr;0</span></span> <span class="frac-display"><span class="frac-num">(√(x+4) - 2)</span><span class="frac-line"></span><span class="frac-den">x</span></span></span></p>
+                                    <p>Multiply by conjugate (<span class="math-formula">√(x+4) + 2</span>). Numerator becomes <span class="math-formula">x</span>. Expression is <span class="math-formula"><span class="frac-display"><span class="frac-num">1</span><span class="frac-line"></span><span class="frac-den">(√(x+4) + 2)</span></span></span>. Re-substitute <span class="math-formula">0</span> to get <span class="math-formula">1/4</span>.</p>
                                 </blockquote>
                             </div>
                             <div>
                                 <h4 class="font-semibold text-stone-700">Type 3: Limits to Infinity (Horizontal Asymptotes)</h4>
                                 <p><strong>How to Solve:</strong> Divide every term by the highest power of x in the denominator. Terms like (<span class="math-formula">constant / x&supn;</span>) approach <span class="math-formula">0</span>. Simplify the remaining constants.</p>
                                 <blockquote class="blockquote mt-2 p-3 bg-stone-50 border-l-4 border-teal-500 rounded-r-lg">
-                                    <p><strong>Example:</strong> <span class="math-formula"><span class="limit-op">lim<span class="limit-sub">x&rarr;&infin;</span></span> (3x&sup2; - 2) / (5x&sup2; + 4x)</span></p>
-                                    <p>Highest power is <span class="math-formula">x&sup2;</span>. Divide everything by <span class="math-formula">x&sup2;</span>: <span class="math-formula"><span class="limit-op">lim<span class="limit-sub">x&rarr;&infin;</span></span> (3 - 2/x&sup2;) / (5 + 4/x)</span></p>
-                                    <p>Terms go to zero: <span class="math-formula">(3 - 0) / (5 + 0) = 3/5</span>.</p>
+                                    <p><strong>Example:</strong> <span class="math-formula"><span class="limit-op">lim<span class="limit-sub">x&rarr;&infin;</span></span> <span class="frac-display"><span class="frac-num">(3x&sup2; - 2)</span><span class="frac-line"></span><span class="frac-den">(5x&sup2; + 4x)</span></span></span></p>
+                                    <p>Highest power is <span class="math-formula">x&sup2;</span>. Divide everything by <span class="math-formula">x&sup2;</span>: <span class="math-formula"><span class="limit-op">lim<span class="limit-sub">x&rarr;&infin;</span></span> <span class="frac-display"><span class="frac-num">(3 - <span class="frac-display"><span class="frac-num">2</span><span class="frac-line"></span><span class="frac-den">x&sup2;</span></span>)</span><span class="frac-line"></span><span class="frac-den">(5 + <span class="frac-display"><span class="frac-num">4</span><span class="frac-line"></span><span class="frac-den">x</span></span>)</span></span></span></p>
+                                    <p>Terms go to zero: <span class="math-formula">(3 - 0) / (5 + 0) = <span class="frac-display"><span class="frac-num">3</span><span class="frac-line"></span><span class="frac-den">5</span></span></span>.</p>
                                 </blockquote>
                             </div>
                             <div>
@@ -233,7 +257,7 @@
                         <summary class="p-4 text-xl font-semibold text-stone-800">1. The Derivative from First Principles <span class="icon text-teal-600 transform transition-transform">▶</span></summary>
                         <div class="content-details-body p-4 border-t border-stone-200 text-stone-600 space-y-4">
                             <p><strong>Concept:</strong> The formal definition of the derivative, representing the precise slope at a point.</p>
-                            <p><strong>Formula:</strong> <span class="math-formula">f'(x) = <span class="limit-op">lim<span class="limit-sub">h&rarr;0</span></span> [f(x+h) - f(x)] / h</span></p>
+                            <p><strong>Formula:</strong> <span class="math-formula">f'(x) = <span class="limit-op">lim<span class="limit-sub">h&rarr;0</span></span> <span class="frac-display"><span class="frac-num">[f(x+h) - f(x)]</span><span class="frac-line"></span><span class="frac-den">h</span></span></span></p>
                             <p><strong>How to Solve:</strong> A procedural question. Substitute <span class="math-formula">f(x)</span> into the formula, expand and simplify the numerator until you can cancel the '<span class="math-formula">h</span>' in the denominator, then substitute <span class="math-formula">h=0</span>.</p>
                         </div>
                     </details>
@@ -244,7 +268,7 @@
                             <ul class="list-disc list-inside space-y-2">
                                 <li><strong>Power Rule:</strong> <span class="math-formula">d/dx (xⁿ) = n·xⁿ⁻¹</span></li>
                                 <li><strong>Product Rule:</strong> <span class="math-formula">d/dx (fg) = f'g + fg'</span></li>
-                                <li><strong>Quotient Rule:</strong> <span class="math-formula">d/dx (f/g) = (f'g - fg') / g²</span></li>
+                                <li><strong>Quotient Rule:</strong> <span class="math-formula">d/dx <span class="frac-display"><span class="frac-num">(f)</span><span class="frac-line"></span><span class="frac-den">(g)</span></span> = <span class="frac-display"><span class="frac-num">(f'g - fg')</span><span class="frac-line"></span><span class="frac-den">g²</span></span></span></li>
                                 <li><strong>Chain Rule:</strong> <span class="math-formula">d/dx (f(g(x))) = f'(g(x)) · g'(x)</span>. This is the big one! Differentiate the "outside" function, then multiply by the derivative of the "inside" function.</li>
                             </ul>
                             <blockquote class="blockquote mt-2 p-3 bg-stone-50 border-l-4 border-teal-500 rounded-r-lg">
@@ -271,7 +295,7 @@
                         <summary class="p-4 text-xl font-semibold text-stone-800">1. Tangent and Normal Lines <span class="icon text-teal-600 transform transition-transform">▶</span></summary>
                         <div class="content-details-body p-4 border-t border-stone-200 text-stone-600 space-y-4">
                             <p><strong>Concept:</strong> <span class="math-formula">f'(a)</span> is the slope of the tangent line at <span class="math-formula">x=a</span>. The normal line is perpendicular.</p>
-                            <p><strong>How to Solve:</strong> 1. Find the point <span class="math-formula">(a, f(a))</span>. 2. Find the slope <span class="math-formula">m = f'(a)</span>. For a normal line, use <span class="math-formula">m<sub>normal</sub> = -1/m</span>. 3. Use point-slope form: <span class="math-formula">y - y₁ = m(x - x₁)</span>.</p>
+                            <p><strong>How to Solve:</strong> 1. Find the point <span class="math-formula">(a, f(a))</span>. 2. Find the slope <span class="math-formula">m = f'(a)</span>. For a normal line, use <span class="math-formula">m<sub>normal</sub> = <span class="frac-display"><span class="frac-num">-1</span><span class="frac-line"></span><span class="frac-den">m</span></span></span>. 3. Use point-slope form: <span class="math-formula">y - y₁ = m(x - x₁)</span>.</p>
                         </div>
                     </details>
 
@@ -327,8 +351,8 @@
                             <ul class="list-disc list-inside space-y-2 grid md:grid-cols-2 gap-x-8">
                                 <li><span class="math-formula">d/dx (eˣ) = eˣ</span></li>
                                 <li><span class="math-formula">d/dx (aˣ) = aˣ · ln(a)</span></li>
-                                <li><span class="math-formula">d/dx (ln(x)) = 1/x</span></li>
-                                <li><span class="math-formula">d/dx (logₐ(x)) = 1 / (x · ln(a))</span></li>
+                                <li><span class="math-formula">d/dx (ln(x)) = <span class="frac-display"><span class="frac-num">1</span><span class="frac-line"></span><span class="frac-den">x</span></span></span></li>
+                                <li><span class="math-formula">d/dx (logₐ(x)) = <span class="frac-display"><span class="frac-num">1</span><span class="frac-line"></span><span class="frac-den">(x · ln(a))</span></span></span></li>
                                 <li><span class="math-formula">d/dx (sin(x)) = cos(x)</span></li>
                                 <li><span class="math-formula">d/dx (cos(x)) = -sin(x)</span></li>
                                 <li><span class="math-formula">d/dx (tan(x)) = sec²(x)</span></li>
@@ -383,7 +407,7 @@
                             <ul class="list-disc list-inside space-y-2">
                                 <li><strong>Find the angle between two vectors:</strong> Rearrange the geometric formula to solve for <span class="math-formula">&theta;</span>.</li>
                                 <li><strong>Check for orthogonality (perpendicular):</strong> The dot product is zero.</li>
-                                <li><strong>Find projections (scalar or vector):</strong> Finding the "shadow" of one vector onto another. <span class="math-formula">Proj<sub>v</sub>(u) = ((u·v)/|v|²)v</span>.</li>
+                                <li><strong>Find projections (scalar or vector):</strong> Finding the "shadow" of one vector onto another. <span class="math-formula">Proj<sub>v</sub>(u) = <span class="frac-display"><span class="frac-num">((u·v))</span><span class="frac-line"></span><span class="frac-den">(|v|²)</span></span>v</span>.</li>
                             </ul>
                         </div>
                     </details>
@@ -439,8 +463,8 @@
                         <div class="content-details-body p-4 border-t border-stone-200 text-stone-600 space-y-4">
                              <p><strong>Concept:</strong> Calculating the shortest distance between various geometric objects.</p>
                              <ul class="list-disc list-inside space-y-2">
-                                 <li><strong>Point to Plane:</strong> Use the formula <span class="math-formula">d = |Ax₀+By₀+Cz₀+D| / &radic;(A²+B²+C²)</span>.</li>
-                                 <li><strong>Point to Line:</strong> Use the formula <span class="math-formula">d = |<strong>P₀P</strong> x <strong>d</strong>| / |<strong>d</strong>|</span>.</li>
+                                 <li><strong>Point to Plane:</strong> Use the formula <span class="math-formula">d = <span class="frac-display"><span class="frac-num">|Ax₀+By₀+Cz₀+D|</span><span class="frac-line"></span><span class="frac-den">√(A²+B²+C²)</span></span></span>.</li>
+                                 <li><strong>Point to Line:</strong> Use the formula <span class="math-formula">d = <span class="frac-display"><span class="frac-num">|<strong>P₀P</strong> x <strong>d</strong>|</span><span class="frac-line"></span><span class="frac-den">|<strong>d</strong>|</span></span></span>.</li>
                                  <li><strong>Between Skew Lines:</strong> Project a vector connecting the lines onto their common normal vector (found via cross product of their direction vectors).</li>
                              </ul>
                         </div>
@@ -453,7 +477,7 @@
                              <ul class="list-disc list-inside space-y-2">
                                  <li><strong>Between two lines:</strong> Angle between their direction vectors <span class="math-formula"><strong>d₁</strong></span> and <span class="math-formula"><strong>d₂</strong></span>.</li>
                                  <li><strong>Between two planes:</strong> Angle between their normal vectors <span class="math-formula"><strong>n₁</strong></span> and <span class="math-formula"><strong>n₂</strong></span>.</li>
-                                 <li><strong>Between a line and a plane:</strong> The complement of the angle between the line's direction vector <span class="math-formula"><strong>d</strong></span> and the plane's normal vector <span class="math-formula"><strong>n</strong></span>. (<span class="math-formula">&theta;<sub>line-plane</sub> = 90&deg; - &theta;<sub>d-n</sub></span>).</li>
+                                 <li><strong>Between a line and a plane:</strong> The complement of the angle between the line's direction vector <span class="math-formula"><strong>d</strong></span> and the plane's normal vector <span class="math-formula"><strong>n</strong></span>. (<span class="math-formula">&theta;<sub>line-plane</sub> = 90&deg; - &theta;<sub>d-n</sub></span>). Or using the formula <span class="math-formula">sin(&theta;) = <span class="frac-display"><span class="frac-num">|<strong>d</strong> &middot; <strong>n</strong>|</span><span class="frac-line"></span><span class="frac-den">|<strong>d</strong>| |<strong>n</strong>|</span></span></span>.</li>
                              </ul>
                         </div>
                     </details>
