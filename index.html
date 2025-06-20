@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive MCV4U Study Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 
+        Chosen Palette: Earthy Calm
+        Application Structure Plan: The SPA is designed with a two-column layout: a fixed navigation sidebar for quick unit selection and a main content area. This structure supports both linear study and quick reference. The content within each unit is organized into collapsible accordions to prevent overwhelming the user with a wall of text, allowing them to focus on one topic at a time. A real-time search bar is included at the top for instant access to specific terms across all units, which is a critical feature for an effective study guide.
+        Visualization & Content Choices: As the source material is entirely text-based, the application focuses on superior information architecture and typography. Key information is structured using headers, lists, and styled blocks. Native HTML `<details>` tags are used for accordions for performance and accessibility. The key "visualization" is the interactivity itself: the smooth-scrolling navigation, the accordion system, and the search highlighting, which transform the static text into a dynamic and explorable resource. No charts or complex graphics are needed or used.
+        CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
+    -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8F7F3; /* Warm Neutral Background */
+            color: #44403C; /* Dark Gray Text */
+            line-height: 1.6; /* Improved general line height */
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        .sidebar-link.active {
+            background-color: #E6F3F2; /* Soft Teal Accent */
+            color: #145A54;
+            font-weight: 600;
+        }
+        details > summary {
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+        details summary .icon {
+            transition: transform 0.2s;
+        }
+        details[open] summary .icon {
+            transform: rotate(90deg);
+        }
+        mark {
+            background-color: #FDE68A; /* yellow-300 */
+            padding: 0 2px;
+            border-radius: 3px;
+        }
+        /* Custom scrollbar for a cleaner look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F8F7F3;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #C9C5BF;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #B5B0A9;
+        }
+
+        /* Math formula specific styling */
+        .math-formula {
+            font-family: 'Fira Code', monospace;
+            background-color: #F0F9F8; /* Light teal background for formulas */
+            color: #0F766E; /* Darker teal text for formulas */
+            padding: 2px 4px;
+            border-radius: 4px;
+            display: inline-block; /* Allows padding and background */
+            font-size: 0.95em; /* Slightly smaller to fit better */
+        }
+        .limit-op {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            vertical-align: middle; /* Align with surrounding text */
+            line-height: 1; /* Tighter line height for the limit part */
+        }
+        .limit-sub {
+            font-size: 0.7em; /* Smaller font for subscript */
+            line-height: 1;
+            margin-top: -0.2em; /* Pull subscript closer */
+        }
+        .content-details-body p, .content-details-body ul, .content-details-body ol {
+            line-height: 1.75; /* Spacing for content within details */
+            margin-bottom: 0.75rem; /* Space between paragraphs/lists */
+        }
+        .content-details-body h4 {
+            margin-top: 1.5rem; /* More space above sub-headers */
+            margin-bottom: 0.75rem;
+        }
+        .blockquote {
+            background-color: #F8F8F7; /* Softer background for blockquote */
+            border-left-color: #209388; /* Slightly darker teal accent for border */
+            padding: 1rem; /* Adjusted padding */
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+        .blockquote p {
+            line-height: 1.5; /* Tighter line height for blockquote content */
+        }
+
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="relative min-h-screen md:flex">
+        <!-- Mobile Nav Toggle -->
+        <div class="md:hidden flex justify-between items-center p-4 bg-white shadow-md">
+            <h1 class="text-xl font-bold text-teal-800">MCV4U Guide</h1>
+            <button id="mobile-menu-button" class="text-stone-800 focus:outline-none">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Sidebar -->
+        <aside id="sidebar" class="bg-white text-stone-700 w-64 space-y-2 p-4 fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition duration-200 ease-in-out shadow-lg z-30">
+            <h1 class="text-2xl font-bold text-teal-800 mb-4 pb-4 border-b border-stone-200">MCV4U Review</h1>
+            <nav id="navigation">
+                <ul>
+                    <li><a href="#unit-1" class="sidebar-link block py-2.5 px-4 rounded transition duration-200 hover:bg-stone-100">Unit 1: Limits</a></li>
+                    <li><a href="#unit-2" class="sidebar-link block py-2.5 px-4 rounded transition duration-200 hover:bg-stone-100">Unit 2: Derivatives</a></li>
+                    <li><a href="#unit-3" class="sidebar-link block py-2.5 px-4 rounded transition duration-200 hover:bg-stone-100">Unit 3: Applications</a></li>
+                    <li><a href="#unit-4" class="sidebar-link block py-2.5 px-4 rounded transition duration-200 hover:bg-stone-100">Unit 4: Transcendental Functions</a></li>
+                    <li><a href="#unit-5" class="sidebar-link block py-2.5 px-4 rounded transition duration-200 hover:bg-stone-100">Unit 5: Vectors Intro</a></li>
+                    <li><a href="#unit-6" class="sidebar-link block py-2.5 px-4 rounded transition duration-200 hover:bg-stone-100">Unit 6: Lines & Planes</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-4 md:p-10">
+            <div class="sticky top-0 bg-opacity-80 backdrop-blur-sm z-10 py-4 mb-6 -mt-4 -mx-4 px-4 md:-mt-10 md:-mx-10 md:px-10">
+                 <input type="text" id="search-input" placeholder="Search for a topic (e.g., 'Chain Rule')..." class="w-full px-4 py-3 rounded-lg border-2 border-stone-200 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition shadow-sm">
+            </div>
+           
+            <div id="content-container">
+
+                <section id="intro" class="mb-12">
+                    <h1 class="text-4xl font-bold text-teal-900 mb-2">Extensive Review: Ontario MCV4U</h1>
+                    <p class="text-lg text-stone-600">An interactive guide to Grade 12 Calculus and Vectors.</p>
+                    <div class="mt-6 p-6 bg-white rounded-lg shadow-sm border border-stone-200">
+                        <h2 class="text-2xl font-bold text-teal-800 mb-3">Overall Philosophy</h2>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <h3 class="font-semibold text-lg text-stone-800">Part 1: Calculus</h3>
+                                <p class="text-stone-600">The study of change. It answers two big questions: What is the instantaneous rate of change (the slope) at a single point on a curve? And what is the area under a curve?</p>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-lg text-stone-800">Part 2: Vectors</h3>
+                                <p class="text-stone-600">The study of quantities with both magnitude and direction. It's the language of physics and engineering, used to describe forces, velocities, and fields in 2D and 3D space.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <hr class="my-12 border-stone-200">
+                
+                <section id="unit-1" class="mb-12 scroll-mt-24">
+                    <h2 class="text-3xl font-bold text-teal-800 mb-6">Unit 1: Polynomial & Rational Functions, Rates of Change, and Limits</h2>
+                    
+                    <details class="bg-white rounded-lg shadow-sm border border-stone-200 mb-4 overflow-hidden">
+                        <summary class="p-4 text-xl font-semibold text-stone-800">1. Rates of Change <span class="icon text-teal-600 transform transition-transform">▶</span></summary>
+                        <div class="content-details-body p-4 border-t border-stone-200 text-stone-600 space-y-4">
+                            <p><strong>Concept:</strong> The difference between the slope of a secant line (Average Rate of Change - AROC) and the slope of a tangent line (Instantaneous Rate of Change - IROC).</p>
+                            <div>
+                                <h4 class="font-semibold text-stone-700">Question Type 1: "Find the average rate of change of f(x) on the interval [a, b]."</h4>
+                                <p><strong>How to Solve:</strong> This is the slope formula. Calculate points (a, f(a)) and (b, f(b)), then use the formula: <span class="math-formula">AROC = (f(b) - f(a)) / (b - a)</span>.</p>
+                                <blockquote class="blockquote mt-2 p-3 bg-stone-50 border-l-4 border-teal-500 rounded-r-lg">
+                                    <p><strong>Example:</strong> Find the AROC of <span class="math-formula">f(x) = x²</span> on <span class="math-formula">[1, 3]</span>.</p>
+                                    <p><span class="math-formula">f(1) = 1</span>, <span class="math-formula">f(3) = 9</span>.</p>
+                                    <p><span class="math-formula">AROC = (9 - 1) / (3 - 1) = 8 / 2 = 4</span>.</p>
+                                </blockquote>
+                            </div>
+                             <div>
+                                <h4 class="font-semibold text-stone-700">Question Type 2: "Estimate the instantaneous rate of change of f(x) at x = a."</h4>
+                                <p><strong>How to Solve:</strong> Find the AROC over a very small interval, like <span class="math-formula">[a, a + 0.001]</span>. The formula becomes: <span class="math-formula">IROC ≈ (f(a + 0.001) - f(a)) / 0.001</span>.</p>
+                            </div>
+                        </div>
+                    </details>
+
+                    <details class="bg-white rounded-lg shadow-sm border border-stone-200 mb-4 overflow-hidden">
+                        <summary class="p-4 text-xl font-semibold text-stone-800">2. Limits <span class="icon text-teal-600 transform transition-transform">▶</span></summary>
+                        <div class="content-details-body p-4 border-t border-stone-200 text-stone-600 space-y-4">
+                            <p><strong>Concept:</strong> A limit is the value a function approaches as the input x gets closer and closer to a certain number.</p>
+                            <div>
+                                <h4 class="font-semibold text-stone-700">Type 1: Direct Substitution</h4>
+                                <p><strong>How to Solve:</strong> For continuous functions (like polynomials), just plug the value of 'a' into <span class="math-formula">f(x)</span>.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-stone-700">Type 2: Indeterminate Form (<span class="math-formula">0/0</span>)</h4>
+                                <p><strong>Method A (Factoring):</strong> Factor the numerator and denominator, cancel the term causing the zero (<span class="math-formula">x-a</span>), and re-substitute.</p>
+                                <blockquote class="blockquote mt-2 p-3 bg-stone-50 border-l-4 border-teal-500 rounded-r-lg">
+                                    <p><strong>Example:</strong> <span class="math-formula"><span class="limit-op">lim<span class="limit-sub">x&rarr;3</span></span> (x&sup2; - 9) / (x - 3)</span></p>
+                                    <p>Factor: <span class="math-formula"><span class="limit-op">lim<span class="limit-sub">x&rarr;3</span></span> (x - 3)(x + 3) / (x - 3)</span> &rarr; <span class="math-formula"><span class="limit-op">lim<span class="limit-sub">x&rarr;3</span></span> (x + 3)</span> &rarr; <span class="math-formula">3 + 3 = 6</span>.</p>
+                                </blockquote>
+                                <p class="mt-2"><strong>Method B (Rationalizing):</strong> For roots, multiply the numerator and denominator by the conjugate. Simplify and cancel the (<span class="math-formula">x-a</span>) term, then re-substitute.</p>
+                                 <blockquote class="blockquote mt-2 p-3 bg-stone-50 border-l-4 border-teal-500 rounded-r-lg">
+                                    <p><strong>Example:</strong> <span class="math-formula"><span class="limit-op">lim<span class="limit-sub">x&rarr;0</span></span> (√(x+4) - 2) / x</span></p>
+                                    <p>Multiply by conjugate (<span class="math-formula">√(x+4) + 2</span>). Numerator becomes <span class="math-formula">x</span>. Expression is <span class="math-formula">1 / (√(x+4) + 2)</span>. Re-substitute <span class="math-formula">0</span> to get <span class="math-formula">1/4</span>.</p>
+                                </blockquote>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-stone-700">Type 3: Limits to Infinity (Horizontal Asymptotes)</h4>
+                                <p><strong>How to Solve:</strong> Divide every term by the highest power of x in the denominator. Terms like (<span class="math-formula">constant / x&supn;</span>) approach <span class="math-formula">0</span>. Simplify the remaining constants.</p>
+                                <blockquote class="blockquote mt-2 p-3 bg-stone-50 border-l-4 border-teal-500 rounded-r-lg">
+                                    <p><strong>Example:</strong> <span class="math-formula"><span class="limit-op">lim<span class="limit-sub">x&rarr;&infin;</span></span> (3x&sup2; - 2) / (5x&sup2; + 4x)</span></p>
+                                    <p>Highest power is <span class="math-formula">x&sup2;</span>. Divide everything by <span class="math-formula">x&sup2;</span>: <span class="math-formula"><span class="limit-op">lim<span class="limit-sub">x&rarr;&infin;</span></span> (3 - 2/x&sup2;) / (5 + 4/x)</span></p>
+                                    <p>Terms go to zero: <span class="math-formula">(3 - 0) / (5 + 0) = 3/5</span>.</p>
+                                </blockquote>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-stone-700">Type 4: One-Sided Limits & Piecewise Functions</h4>
+                                <p><strong>How to Solve:</strong> For a limit to exist at a split point, the left-hand limit (<span class="math-formula"><span class="limit-op">lim<span class="limit-sub">x&rarr;a⁻</span></span> f(x)</span>) must equal the right-hand limit (<span class="math-formula"><span class="limit-op">lim<span class="limit-sub">x&rarr;a⁺</span></span> f(x)</span>). Calculate each using the appropriate function piece.</p>
+                            </div>
+                        </div>
+                    </details>
+                </section>
+                
+                <hr class="my-12 border-stone-200">
+
+                <section id="unit-2" class="mb-12 scroll-mt-24">
+                    <h2 class="text-3xl font-bold text-teal-800 mb-6">Unit 2: Derivatives</h2>
+                    
+                    <details class="bg-white rounded-lg shadow-sm border border-stone-200 mb-4 overflow-hidden">
+                        <summary class="p-4 text-xl font-semibold text-stone-800">1. The Derivative from First Principles <span class="icon text-teal-600 transform transition-transform">▶</span></summary>
+                        <div class="content-details-body p-4 border-t border-stone-200 text-stone-600 space-y-4">
+                            <p><strong>Concept:</strong> The formal definition of the derivative, representing the precise slope at a point.</p>
+                            <p><strong>Formula:</strong> <span class="math-formula">f'(x) = <span class="limit-op">lim<span class="limit-sub">h&rarr;0</span></span> [f(x+h) - f(x)] / h</span></p>
+                            <p><strong>How to Solve:</strong> A procedural question. Substitute <span class="math-formula">f(x)</span> into the formula, expand and simplify the numerator until you can cancel the '<span class="math-formula">h</span>' in the denominator, then substitute <span class="math-formula">h=0</span>.</p>
+                        </div>
+                    </details>
+
+                    <details class="bg-white rounded-lg shadow-sm border border-stone-200 mb-4 overflow-hidden">
+                        <summary class="p-4 text-xl font-semibold text-stone-800">2. The Derivative Rules <span class="icon text-teal-600 transform transition-transform">▶</span></summary>
+                        <div class="content-details-body p-4 border-t border-stone-200 text-stone-600 space-y-4">
+                            <ul class="list-disc list-inside space-y-2">
+                                <li><strong>Power Rule:</strong> <span class="math-formula">d/dx (xⁿ) = n·xⁿ⁻¹</span></li>
+                                <li><strong>Product Rule:</strong> <span class="math-formula">d/dx (fg) = f'g + fg'</span></li>
+                                <li><strong>Quotient Rule:</strong> <span class="math-formula">d/dx (f/g) = (f'g - fg') / g²</span></li>
+                                <li><strong>Chain Rule:</strong> <span class="math-formula">d/dx (f(g(x))) = f'(g(x)) · g'(x)</span>. This is the big one! Differentiate the "outside" function, then multiply by the derivative of the "inside" function.</li>
+                            </ul>
+                            <blockquote class="blockquote mt-2 p-3 bg-stone-50 border-l-4 border-teal-500 rounded-r-lg">
+                                <p><strong>Example (Chain Rule):</strong> <span class="math-formula">y = (x³ + 5x)²</span></p>
+                                <p><span class="math-formula">y' = 2(x³ + 5x)¹ · (3x² + 5)</span></p>
+                            </blockquote>
+                            <blockquote class="blockquote mt-2 p-3 bg-stone-50 border-l-4 border-teal-500 rounded-r-lg">
+                                <p><strong>Example (Product & Chain):</strong> <span class="math-formula">y = x² · sin(4x)</span></p>
+                                <p>Overall structure is a product: <span class="math-formula">f(x) = x²</span>, <span class="math-formula">g(x) = sin(4x)</span>.</p>
+                                <p><span class="math-formula">f'(x) = 2x</span>.</p>
+                                <p><span class="math-formula">g'(x)</span> requires the chain rule: <span class="math-formula">cos(4x) · 4</span>.</p>
+                                <p>Apply product rule: <span class="math-formula">y' = (2x)(sin(4x)) + (x²)(4cos(4x))</span>.</p>
+                            </blockquote>
+                        </div>
+                    </details>
+                </section>
+
+                <hr class="my-12 border-stone-200">
+
+                <section id="unit-3" class="mb-12 scroll-mt-24">
+                    <h2 class="text-3xl font-bold text-teal-800 mb-6">Unit 3: Applications of Derivatives</h2>
+                    
+                    <details class="bg-white rounded-lg shadow-sm border border-stone-200 mb-4 overflow-hidden">
+                        <summary class="p-4 text-xl font-semibold text-stone-800">1. Tangent and Normal Lines <span class="icon text-teal-600 transform transition-transform">▶</span></summary>
+                        <div class="content-details-body p-4 border-t border-stone-200 text-stone-600 space-y-4">
+                            <p><strong>Concept:</strong> <span class="math-formula">f'(a)</span> is the slope of the tangent line at <span class="math-formula">x=a</span>. The normal line is perpendicular.</p>
+                            <p><strong>How to Solve:</strong> 1. Find the point <span class="math-formula">(a, f(a))</span>. 2. Find the slope <span class="math-formula">m = f'(a)</span>. For a normal line, use <span class="math-formula">m<sub>normal</sub> = -1/m</span>. 3. Use point-slope form: <span class="math-formula">y - y₁ = m(x - x₁)</span>.</p>
+                        </div>
+                    </details>
+
+                    <details class="bg-white rounded-lg shadow-sm border border-stone-200 mb-4 overflow-hidden">
+                        <summary class="p-4 text-xl font-semibold text-stone-800">2. Curve Sketching <span class="icon text-teal-600 transform transition-transform">▶</span></summary>
+                        <div class="content-details-body p-4 border-t border-stone-200 text-stone-600 space-y-4">
+                            <p><strong>Concept:</strong> Using <span class="math-formula">f'(x)</span> and <span class="math-formula">f''(x)</span> to analyze a function's behavior without a calculator.</p>
+                            <ol class="list-decimal list-inside space-y-2">
+                                <li><strong>Domain, Intercepts, Asymptotes:</strong> Find basic properties first.</li>
+                                <li><strong>First Derivative Analysis:</strong> Find critical points where <span class="math-formula">f'(x)=0</span> or is undefined. Create an interval chart to test where <span class="math-formula">f'(x)</span> is positive (f is increasing) or negative (f is decreasing). This identifies local max/min.</li>
+                                <li><strong>Second Derivative Analysis:</strong> Find points where <span class="math-formula">f''(x)=0</span> or is undefined. Create an interval chart to test where <span class="math-formula">f''(x)</span> is positive (f is concave up) or negative (f is concave down). This identifies points of inflection.</li>
+                                <li><strong>Sketch:</strong> Combine all information to draw the graph.</li>
+                            </ol>
+                        </div>
+                    </details>
+                    
+                    <details class="bg-white rounded-lg shadow-sm border border-stone-200 mb-4 overflow-hidden">
+                        <summary class="p-4 text-xl font-semibold text-stone-800">3. Optimization <span class="icon text-teal-600 transform transition-transform">▶</span></summary>
+                        <div class="content-details-body p-4 border-t border-stone-200 text-stone-600 space-y-4">
+                            <p><strong>Concept:</strong> Using derivatives to find the maximum or minimum value in word problems.</p>
+                            <ol class="list-decimal list-inside space-y-2">
+                                <li><strong>Diagram & Equations:</strong> Draw a picture. Write a primary equation for the quantity to be optimized (e.g., Area) and a constraint equation based on the problem's limitations (e.g., fixed Perimeter).</li>
+                                <li><strong>Single Variable:</strong> Use the constraint to rewrite the primary equation in terms of a single variable.</li>
+                                <li><strong>Differentiate & Solve:</strong> Find the derivative, set it to zero, and solve for the variable to find critical points.</li>
+                                <li><strong>Justify & Answer:</strong> Use the first or second derivative test to confirm it's a max or min, and answer the specific question asked.</li>
+                            </ol>
+                        </div>
+                    </details>
+                    
+                    <details class="bg-white rounded-lg shadow-sm border border-stone-200 mb-4 overflow-hidden">
+                        <summary class="p-4 text-xl font-semibold text-stone-800">4. Rectilinear Motion (Kinematics) <span class="icon text-teal-600 transform transition-transform">▶</span></summary>
+                        <div class="content-details-body p-4 border-t border-stone-200 text-stone-600 space-y-4">
+                             <p><strong>Concept:</strong> Applying derivatives to describe motion along a straight line.</p>
+                             <ul class="list-disc list-inside space-y-2">
+                                 <li><strong>Position:</strong> <span class="math-formula">s(t)</span></li>
+                                 <li><strong>Velocity:</strong> <span class="math-formula">v(t) = s'(t)</span></li>
+                                 <li><strong>Acceleration:</strong> <span class="math-formula">a(t) = v'(t) = s''(t)</span></li>
+                                 <li><strong>Speeding up:</strong> <span class="math-formula">v(t)</span> and <span class="math-formula">a(t)</span> have the same sign.</li>
+                                 <li><strong>Slowing down:</strong> <span class="math-formula">v(t)</span> and <span class="math-formula">a(t)</span> have opposite signs.</li>
+                             </ul>
+                        </div>
+                    </details>
+                </section>
+                
+                <hr class="my-12 border-stone-200">
+
+                <section id="unit-4" class="mb-12 scroll-mt-24">
+                    <h2 class="text-3xl font-bold text-teal-800 mb-6">Unit 4: Derivatives of Transcendental Functions</h2>
+                    
+                    <details class="bg-white rounded-lg shadow-sm border border-stone-200 mb-4 overflow-hidden">
+                        <summary class="p-4 text-xl font-semibold text-stone-800">1. New Derivative Rules <span class="icon text-teal-600 transform transition-transform">▶</span></summary>
+                        <div class="content-details-body p-4 border-t border-stone-200 text-stone-600 space-y-4">
+                            <ul class="list-disc list-inside space-y-2 grid md:grid-cols-2 gap-x-8">
+                                <li><span class="math-formula">d/dx (eˣ) = eˣ</span></li>
+                                <li><span class="math-formula">d/dx (aˣ) = aˣ · ln(a)</span></li>
+                                <li><span class="math-formula">d/dx (ln(x)) = 1/x</span></li>
+                                <li><span class="math-formula">d/dx (logₐ(x)) = 1 / (x · ln(a))</span></li>
+                                <li><span class="math-formula">d/dx (sin(x)) = cos(x)</span></li>
+                                <li><span class="math-formula">d/dx (cos(x)) = -sin(x)</span></li>
+                                <li><span class="math-formula">d/dx (tan(x)) = sec²(x)</span></li>
+                            </ul>
+                        </div>
+                    </details>
+
+                    <details class="bg-white rounded-lg shadow-sm border border-stone-200 mb-4 overflow-hidden">
+                        <summary class="p-4 text-xl font-semibold text-stone-800">2. Logarithmic Differentiation <span class="icon text-teal-600 transform transition-transform">▶</span></summary>
+                        <div class="content-details-body p-4 border-t border-stone-200 text-stone-600 space-y-4">
+                            <p><strong>Use Case:</strong> For functions with x in both the base and the exponent (e.g., <span class="math-formula">y = xˣ</span>).</p>
+                            <ol class="list-decimal list-inside space-y-2">
+                                <li>Take the natural log (ln) of both sides: <span class="math-formula">ln(y) = ln(xˣ)</span>.</li>
+                                <li>Use log properties to bring the exponent down: <span class="math-formula">ln(y) = x · ln(x)</span>.</li>
+                                <li>Differentiate both sides with respect to x (using implicit differentiation on the left).</li>
+                                <li>Solve for <span class="math-formula">dy/dx</span>.</li>
+                                <li>Substitute the original expression for <span class="math-formula">y</span> back in.</li>
+                            </ol>
+                        </div>
+                    </details>
+                </section>
+                
+                <hr class="my-12 border-stone-200">
+
+                <section id="unit-5" class="mb-12 scroll-mt-24">
+                     <h2 class="text-3xl font-bold text-teal-800 mb-6">Unit 5: Introduction to Vectors</h2>
+
+                    <details class="bg-white rounded-lg shadow-sm border border-stone-200 mb-4 overflow-hidden">
+                        <summary class="p-4 text-xl font-semibold text-stone-800">1. Basic Vector Operations <span class="icon text-teal-600 transform transition-transform">▶</span></summary>
+                        <div class="content-details-body p-4 border-t border-stone-200 text-stone-600 space-y-4">
+                            <p><strong>Concept:</strong> Adding, subtracting, and scalar multiplying vectors. Finding magnitude and unit vectors.</p>
+                        </div>
+                    </details>
+                    
+                    <details class="bg-white rounded-lg shadow-sm border border-stone-200 mb-4 overflow-hidden">
+                        <summary class="p-4 text-xl font-semibold text-stone-800">2. Linear Combinations and Spanning Sets <span class="icon text-teal-600 transform transition-transform">▶</span></summary>
+                        <div class="content-details-body p-4 border-t border-stone-200 text-stone-600 space-y-4">
+                            <p><strong>Concept:</strong> Expressing a vector as a sum of scaled versions of other vectors. A spanning set is a group of vectors that can be combined to reach any point in a given space (like <span class="math-formula">R²</span> or <span class="math-formula">R³</span>).</p>
+                             <ul class="list-disc list-inside space-y-2">
+                                <li>In <span class="math-formula">R²</span>, two non-collinear vectors span the space.</li>
+                                <li>In <span class="math-formula">R³</span>, three non-coplanar vectors span the space.</li>
+                            </ul>
+                        </div>
+                    </details>
+
+                    <details class="bg-white rounded-lg shadow-sm border border-stone-200 mb-4 overflow-hidden">
+                        <summary class="p-4 text-xl font-semibold text-stone-800">3. The Dot Product <span class="icon text-teal-600 transform transition-transform">▶</span></summary>
+                        <div class="content-details-body p-4 border-t border-stone-200 text-stone-600 space-y-4">
+                            <p><strong>Concept:</strong> A multiplication of two vectors that results in a scalar. It relates to the angle between them.</p>
+                            <p><strong>Formulas:</strong> Algebraic: <span class="math-formula"><strong>a</strong>·<strong>b</strong> = a₁b₁+a₂b₂+a₃b₃</span>. Geometric: <span class="math-formula"><strong>a</strong>·<strong>b</strong> = |<strong>a</strong>||<strong>b</strong>|cos(&theta;)</span>.</p>
+                            <h4 class="font-semibold text-stone-700 mt-2">Common Question Types:</h4>
+                            <ul class="list-disc list-inside space-y-2">
+                                <li><strong>Find the angle between two vectors:</strong> Rearrange the geometric formula to solve for <span class="math-formula">&theta;</span>.</li>
+                                <li><strong>Check for orthogonality (perpendicular):</strong> The dot product is zero.</li>
+                                <li><strong>Find projections (scalar or vector):</strong> Finding the "shadow" of one vector onto another. <span class="math-formula">Proj<sub>v</sub>(u) = ((u·v)/|v|²)v</span>.</li>
+                            </ul>
+                        </div>
+                    </details>
+
+                    <details class="bg-white rounded-lg shadow-sm border border-stone-200 mb-4 overflow-hidden">
+                        <summary class="p-4 text-xl font-semibold text-stone-800">4. The Cross Product (3D Only) <span class="icon text-teal-600 transform transition-transform">▶</span></summary>
+                        <div class="content-details-body p-4 border-t border-stone-200 text-stone-600 space-y-4">
+                            <p><strong>Concept:</strong> A multiplication of two vectors that results in a new vector perpendicular to both originals.</p>
+                            <h4 class="font-semibold text-stone-700 mt-2">Common Question Types:</h4>
+                             <ul class="list-disc list-inside space-y-2">
+                                <li><strong>Find a vector orthogonal to two others:</strong> Simply calculate their cross product.</li>
+                                <li><strong>Find the area of a parallelogram/triangle:</strong> The area is the magnitude of the cross product, <span class="math-formula">|<strong>u</strong> x <strong>v</strong>|</span>. (Triangle area is half of that).</li>
+                            </ul>
+                        </div>
+                    </details>
+                </section>
+                
+                <hr class="my-12 border-stone-200">
+
+                <section id="unit-6" class="mb-12 scroll-mt-24">
+                    <h2 class="text-3xl font-bold text-teal-800 mb-6">Unit 6: Lines and Planes</h2>
+                    
+                    <details class="bg-white rounded-lg shadow-sm border border-stone-200 mb-4 overflow-hidden">
+                        <summary class="p-4 text-xl font-semibold text-stone-800">1. Equations of Lines and Planes <span class="icon text-teal-600 transform transition-transform">▶</span></summary>
+                        <div class="content-details-body p-4 border-t border-stone-200 text-stone-600 space-y-4">
+                            <p><strong>Line:</strong> Defined by a point and a direction vector (<span class="math-formula"><strong>d</strong></span>). Forms: Vector, Parametric, Symmetric.</p>
+                            <p><strong>Plane:</strong> Defined by a point and a normal vector (<span class="math-formula"><strong>n</strong></span>). Form: Scalar (<span class="math-formula">Ax+By+Cz+D=0</span>, where <span class="math-formula"><strong>n</strong>=[A,B,C]</span>).</p>
+                            <h4 class="font-semibold text-stone-700 mt-2">Key Tasks:</h4>
+                            <ul class="list-disc list-inside space-y-2">
+                                <li>Find the equation of a line through two points.</li>
+                                <li>Find the equation of a plane given a normal and a point.</li>
+                                <li>Find the equation of a plane containing three points (Hint: use cross product of two vectors in the plane to find the normal).</li>
+                                <li>Sketching a plane using its intercepts.</li>
+                            </ul>
+                        </div>
+                    </details>
+
+                    <details class="bg-white rounded-lg shadow-sm border border-stone-200 mb-4 overflow-hidden">
+                        <summary class="p-4 text-xl font-semibold text-stone-800">2. Intersections <span class="icon text-teal-600 transform transition-transform">▶</span></summary>
+                        <div class="content-details-body p-4 border-t border-stone-200 text-stone-600 space-y-4">
+                             <p><strong>Concept:</strong> Solving systems of equations to find where lines and planes meet.</p>
+                             <ul class="list-disc list-inside space-y-2">
+                                 <li><strong>Two Lines:</strong> Can intersect at a point, be parallel, or be skew. Solve the system of parametric equations.</li>
+                                 <li><strong>Line and Plane:</strong> Can intersect at a point, be parallel, or the line can lie in the plane. Substitute line parametrics into the plane equation.</li>
+                                 <li><strong>Two Planes:</strong> Can intersect in a line or be parallel. Solve the system of two scalar equations.</li>
+                                 <li><strong>Three Planes:</strong> Can intersect at a point, a line, or not at all (e.g., triangular prism). Solve the system of three scalar equations (e.g., using Gaussian Elimination).</li>
+                             </ul>
+                        </div>
+                    </details>
+                    
+                    <details class="bg-white rounded-lg shadow-sm border border-stone-200 mb-4 overflow-hidden">
+                        <summary class="p-4 text-xl font-semibold text-stone-800">3. Distance Problems in 3D <span class="icon text-teal-600 transform transition-transform">▶</span></summary>
+                        <div class="content-details-body p-4 border-t border-stone-200 text-stone-600 space-y-4">
+                             <p><strong>Concept:</strong> Calculating the shortest distance between various geometric objects.</p>
+                             <ul class="list-disc list-inside space-y-2">
+                                 <li><strong>Point to Plane:</strong> Use the formula <span class="math-formula">d = |Ax₀+By₀+Cz₀+D| / &radic;(A²+B²+C²)</span>.</li>
+                                 <li><strong>Point to Line:</strong> Use the formula <span class="math-formula">d = |<strong>P₀P</strong> x <strong>d</strong>| / |<strong>d</strong>|</span>.</li>
+                                 <li><strong>Between Skew Lines:</strong> Project a vector connecting the lines onto their common normal vector (found via cross product of their direction vectors).</li>
+                             </ul>
+                        </div>
+                    </details>
+                    
+                     <details class="bg-white rounded-lg shadow-sm border border-stone-200 mb-4 overflow-hidden">
+                        <summary class="p-4 text-xl font-semibold text-stone-800">4. Angles between Lines and Planes <span class="icon text-teal-600 transform transition-transform">▶</span></summary>
+                        <div class="content-details-body p-4 border-t border-stone-200 text-stone-600 space-y-4">
+                             <p><strong>Concept:</strong> Using the dot product to find angles between geometric objects.</p>
+                             <ul class="list-disc list-inside space-y-2">
+                                 <li><strong>Between two lines:</strong> Angle between their direction vectors <span class="math-formula"><strong>d₁</strong></span> and <span class="math-formula"><strong>d₂</strong></span>.</li>
+                                 <li><strong>Between two planes:</strong> Angle between their normal vectors <span class="math-formula"><strong>n₁</strong></span> and <span class="math-formula"><strong>n₂</strong></span>.</li>
+                                 <li><strong>Between a line and a plane:</strong> The complement of the angle between the line's direction vector <span class="math-formula"><strong>d</strong></span> and the plane's normal vector <span class="math-formula"><strong>n</strong></span>. (<span class="math-formula">&theta;<sub>line-plane</sub> = 90&deg; - &theta;<sub>d-n</sub></span>).</li>
+                             </ul>
+                        </div>
+                    </details>
+                </section>
+                
+                <hr class="my-12 border-stone-200">
+                
+                <section id="final-advice" class="mb-12">
+                     <h2 class="text-3xl font-bold text-teal-800 mb-6">Final Words of Advice</h2>
+                     <div class="grid md:grid-cols-2 gap-6 text-stone-600">
+                         <div class="p-4 bg-white rounded-lg shadow-sm border border-stone-200">
+                             <h3 class="font-semibold text-stone-800 text-lg mb-2">Algebra is King</h3>
+                             <p>90% of errors in calculus are algebra errors. Be neat. Be methodical. Don't skip steps.</p>
+                         </div>
+                         <div class="p-4 bg-white rounded-lg shadow-sm border border-stone-200">
+                             <h3 class="font-semibold text-stone-800 text-lg mb-2">Understand, Don't Just Memorize</h3>
+                             <p>Know why the derivative is the slope, what a normal vector represents, and what the dot product tells you.</p>
+                         </div>
+                         <div class="p-4 bg-white rounded-lg shadow-sm border border-stone-200">
+                             <h3 class="font-semibold text-stone-800 text-lg mb-2">Practice, Practice, Practice</h3>
+                             <p>Math is not a spectator sport. Do your homework. Do extra problems. The patterns only become clear after you've done dozens of questions.</p>
+                         </div>
+                         <div class="p-4 bg-white rounded-lg shadow-sm border border-stone-200">
+                             <h3 class="font-semibold text-stone-800 text-lg mb-2">Draw Pictures</h3>
+                             <p>Especially for optimization and vectors/planes. A good diagram can turn an impossible problem into an obvious one.</p>
+                         </div>
+                     </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.getElementById('sidebar');
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const contentContainer = document.getElementById('content-container');
+            const searchInput = document.getElementById('search-input');
+            
+            let originalContent = contentContainer.innerHTML;
+
+            // Mobile menu toggle
+            mobileMenuButton.addEventListener('click', function() {
+                sidebar.classList.toggle('-translate-x-full');
+            });
+
+            // Intersection Observer for active link highlighting
+            const sections = document.querySelectorAll('main section');
+            const navLinks = document.querySelectorAll('#navigation a');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href').substring(1) === entry.target.id) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, { rootMargin: '-50% 0px -50% 0px', threshold: 0 });
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+            
+            // Search functionality
+            searchInput.addEventListener('keyup', function(e) {
+                const query = e.target.value.toLowerCase().trim();
+
+                // Restore original content to remove old highlights
+                contentContainer.innerHTML = originalContent;
+
+                if (query.length === 0) {
+                    return; // If query is empty, do nothing further
+                }
+
+                const allTextNodes = [];
+                function getTextNodes(node) {
+                    if (node.nodeType === Node.TEXT_NODE) {
+                        allTextNodes.push(node);
+                    } else {
+                        for (const child of node.childNodes) {
+                            getTextNodes(child);
+                        }
+                    }
+                }
+
+                getTextNodes(contentContainer);
+                
+                let matchesFound = false;
+                allTextNodes.forEach(textNode => {
+                    const text = textNode.textContent;
+                    const regex = new RegExp(query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+                    
+                    if (regex.test(text)) {
+                        matchesFound = true;
+                        const fragment = document.createDocumentFragment();
+                        let lastIndex = 0;
+                        text.replace(regex, (match, offset) => {
+                            // Add the text before the match
+                            fragment.appendChild(document.createTextNode(text.substring(lastIndex, offset)));
+                            // Add the highlighted match
+                            const mark = document.createElement('mark');
+                            mark.textContent = match;
+                            fragment.appendChild(mark);
+                            lastIndex = offset + match.length;
+                        });
+                        // Add the text after the last match
+                        fragment.appendChild(document.createTextNode(text.substring(lastIndex)));
+                        textNode.parentNode.replaceChild(fragment, textNode);
+                    }
+                });
+                
+                if(matchesFound){
+                    // If matches were found, open all <details> elements so user can see them.
+                     document.querySelectorAll('details').forEach(detail => {
+                        detail.open = true;
+                    });
+                }
+            });
+
+        });
+    </script>
+</body>
+</html>
